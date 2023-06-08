@@ -16,4 +16,32 @@ type Purchase struct {
 	Amount string
 }
 
-// Other database models and related functions
+func GetClientNames() []string {
+	rows, err := DB.Query("SELECT name FROM kirim.client;")
+	if err != nil {
+		return nil
+	}
+	defer rows.Close()
+	var clientNames []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil
+		}
+		clientNames = append(clientNames, name)
+	}
+	if err := rows.Err(); err != nil {
+		return nil
+	}
+	return clientNames
+}
+func GenerateDropdownHTML() string {
+	clientNames := GetClientNames()
+	dropdownHTML := "<select name='client'>"
+	for _, name := range clientNames {
+		dropdownHTML += "<option value='" + name + "'>" + name + "</option>"
+	}
+
+	dropdownHTML += "</select>"
+	return dropdownHTML
+}
