@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{{if .Success}}
+<h1>registered!</h1>
+{{else}}
+<h1>Kirim</h1>
+<form method="POST">
+    <label>client name:</label><br />
+    <input type="text" name="cname"autofocus><br />
+    <label>date:</label><br />
+    <input type="date" name="date"autofocus><br />
+    <label>tovar nomi</label><br>
+    <input type="text" name="name_of_purchase" autofocus><br>
+    <label >sort</label><br>
+    <input list="browsers" name="sort" autofocus>
+    <datalist id="browsers">
+        <option value="kg">
+        <option value="dona">
+        <option value="litr">
+        <option value="tonna">
+    </datalist><br>
+    <label>amount:</label><br>
+    <input type="text" name="amount" autofocus><br>
+    <label>cost per:</label><br>
+    <input type="text" name="cost" autofocus><br>
+    <input type="submit">
+</form>
+{{end}}
+</body>
+</html>
