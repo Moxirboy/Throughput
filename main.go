@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", hand.HandleRoot)
-	http.HandleFunc("/client", hand.HandleRoot1)
+	http.HandleFunc("/kirim", hand.HandleRoot)
+	http.HandleFunc("/chiqim", hand.HandleRoot1)
 	http.ListenAndServe(":8080", nil)
 }

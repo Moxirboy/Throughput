@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	db "project/database"
+	"time"
 )
 
 func HandleRoot(w http.ResponseWriter, r *http.Request) {
@@ -74,10 +76,72 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, struct{ Success bool }{true})
 }
 func HandleRoot1(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/index2.html"))
-	dropdownHTML := db.GenerateDropdownHTML()
+	tmpl := template.Must(template.ParseFiles("templates/index1.html"))
+	DropdownHTMLClient := db.GenerateDropdownHTMLClient()
 	tmpl.Execute(w, map[string]interface{}{
-		"DropdownHTML": template.HTML(dropdownHTML),
+		"DropdownHTMLClient": template.HTML(DropdownHTMLClient),
 	})
-
+	DropdownHTMLGoods := db.GenerateDropdownHTMLGoods()
+	tmpl.Execute(w, map[string]interface{}{
+		"DropdownHTMLGoods": template.HTML(DropdownHTMLGoods),
+	})
+	r.ParseForm()
+	date := time.Now()
+	Requirement := db.Requirement{
+		Date: date,
+		Client: db.Client{
+			Name: r.FormValue("client"),
+		},
+	}
+	_ = Requirement
+	RequirementGoods := db.Requirement_goods{
+		Product: r.FormValue("goods"),
+		Amount:  r.FormValue("amount"),
+	}
+	_ = RequirementGoods
+	var amountCheck string
+	var goodsId string
+	err := db.DB.QueryRow("select id from kirim.goods where name=?", RequirementGoods.Product).Scan(&goodsId)
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("Panic occurred:", err)
+		}
+	}()
+	if err != nil {
+		fmt.Println(113)
+		panic(err)
+	}
+	err = db.DB.QueryRow("select amount from purchase_goods where goods_id=?", goodsId).Scan(&amountCheck)
+	if err != nil {
+		fmt.Println(118)
+		panic(err)
+	}
+	if amountCheck >= RequirementGoods.Amount {
+		tmpl.Execute(w, struct{ success bool }{true})
+		var clientId string
+		err = db.DB.QueryRow("select id from client where name=?", Requirement.Name).Scan(&clientId)
+		if err != nil {
+			fmt.Println(126)
+			panic(err)
+		}
+		_, err = db.DB.Query("insert into requirement (date,client_id) values(?,?)", Requirement.Date, clientId)
+		if err != nil {
+			fmt.Println(130)
+			panic(err)
+		}
+		var RequirementId string
+		err = db.DB.QueryRow("select id from requirement where client_id=?", clientId).Scan(&RequirementId)
+		if err != nil {
+			fmt.Println(136)
+			panic(err)
+		}
+		_, err = db.DB.Query("insert into requirement_goods (requirement_id,goods_id,amount) values(?,?,?)", RequirementId, goodsId, RequirementGoods.Amount)
+		if err != nil {
+			fmt.Println(141)
+			panic(err)
+		}
+		tmpl.Execute(w, struct{ success bool }{true})
+	} else {
+		tmpl.Execute(w, struct{ success bool }{false})
+	}
 }

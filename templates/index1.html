@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{{if.Success}}
+<h1>success</h1>
+{{else}}
+<form method="POST">
+    <label>Client Names:</label><br>
+    {{.DropdownHTMLGoods}}<br>
+</form>
+{{end}}
+</body>
+</html>
