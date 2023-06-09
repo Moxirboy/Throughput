@@ -10,7 +10,16 @@
 {{else}}
 <form method="POST">
     <label>Client Names:</label><br>
+    {{.DropdownHTMLClient}}<br>
+</form>
+<form method="POST">
+    <label>goods name:</label><br>
     {{.DropdownHTMLGoods}}<br>
+</form>
+<form method="POST">
+    <label>amount</label><br>
+    <input name="amount" type="text"><br>
+    <input type="submit" value="Submit">
 </form>
 {{end}}
 </body>
