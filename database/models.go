@@ -20,13 +20,17 @@ type Purchase struct {
 	Name   string
 	Amount string
 }
+type PurchaseGoods struct {
+	CortPrice string
+}
 type Requirement struct {
 	Date time.Time
 	Client
 }
-type Requirement_goods struct {
-	Product string
-	Amount  string
+type RequirementGoods struct {
+	Product  string
+	Amount   string
+	CostCell string
 }
 
 func GetClientNames() []string {

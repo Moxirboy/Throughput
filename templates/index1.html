@@ -1,25 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
 </head>
 <body>
-{{if.Success}}
+{{if.success}}
 <h1>success</h1>
 {{else}}
-<form method="POST">
-    <label>Client Names:</label><br>
+<form method="get">
+    <label>client name:</label><br>
     {{.DropdownHTMLClient}}<br>
-</form>
-<form method="POST">
     <label>goods name:</label><br>
     {{.DropdownHTMLGoods}}<br>
-</form>
-<form method="POST">
-    <label>amount</label><br>
-    <input name="amount" type="text"><br>
-    <input type="submit" value="Submit">
+    <label>amount:</label><br>
+    <input type="text"  name="amount"><br>
+    <label>cost cell:</label><br>
+    <input type="text" name="cost"><br>
+    <input type="submit">
 </form>
 {{end}}
 </body>

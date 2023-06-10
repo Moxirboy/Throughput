@@ -6,7 +6,7 @@
 </head>
 <body>
 {{if .Success}}
-<h1>registered!</h1>
+<h1>Success!</h1>
 {{else}}
 <h1>Kirim</h1>
 <form method="POST">
@@ -28,6 +28,7 @@
     <input type="text" name="amount" autofocus><br>
     <label>cost per:</label><br>
     <input type="text" name="cost" autofocus><br>
+
     <input type="submit">
 </form>
 {{end}}

@@ -32,6 +32,9 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) {
 		Name:   r.FormValue("name_of_purchase"),
 		Amount: r.FormValue("amount"),
 	}
+	purchaseGoods := db.PurchaseGoods{
+		CortPrice: r.FormValue("cost"),
+	}
 
 	insertClientQuery := "INSERT INTO client (name, created) VALUES (?, ?)"
 	_, err := db.DB.Query(insertClientQuery, details.Name, details.Date)
@@ -67,8 +70,8 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	insertPurchaseGoodsQuery := "INSERT INTO purchase_goods (goods_id, purchase_id, amount) VALUES (?, ?, ?)"
-	_, err = db.DB.Query(insertPurchaseGoodsQuery, productID, purchaseID, purchase.Amount)
+	insertPurchaseGoodsQuery := "INSERT INTO purchase_goods (goods_id, purchase_id, amount,cort_price) VALUES (?, ?, ?,?)"
+	_, err = db.DB.Query(insertPurchaseGoodsQuery, productID, purchaseID, purchase.Amount, purchaseGoods.CortPrice)
 	if err != nil {
 		panic(err)
 	}
@@ -78,12 +81,10 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) {
 func HandleRoot1(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("templates/index1.html"))
 	DropdownHTMLClient := db.GenerateDropdownHTMLClient()
-	tmpl.Execute(w, map[string]interface{}{
-		"DropdownHTMLClient": template.HTML(DropdownHTMLClient),
-	})
 	DropdownHTMLGoods := db.GenerateDropdownHTMLGoods()
 	tmpl.Execute(w, map[string]interface{}{
-		"DropdownHTMLGoods": template.HTML(DropdownHTMLGoods),
+		"DropdownHTMLClient": template.HTML(DropdownHTMLClient),
+		"DropdownHTMLGoods":  template.HTML(DropdownHTMLGoods),
 	})
 	r.ParseForm()
 	date := time.Now()
@@ -94,9 +95,10 @@ func HandleRoot1(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 	_ = Requirement
-	RequirementGoods := db.Requirement_goods{
-		Product: r.FormValue("goods"),
-		Amount:  r.FormValue("amount"),
+	RequirementGoods := db.RequirementGoods{
+		Product:  r.FormValue("goods"),
+		Amount:   r.FormValue("amount"),
+		CostCell: r.FormValue("cost"),
 	}
 	_ = RequirementGoods
 	var amountCheck string
@@ -135,7 +137,7 @@ func HandleRoot1(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(136)
 			panic(err)
 		}
-		_, err = db.DB.Query("insert into requirement_goods (requirement_id,goods_id,amount) values(?,?,?)", RequirementId, goodsId, RequirementGoods.Amount)
+		_, err = db.DB.Query("insert into requirement_goods (requirement_id,goods_id,amount,cost_cell) values(?,?,?,?)", RequirementId, goodsId, RequirementGoods.Amount, RequirementGoods.CostCell)
 		if err != nil {
 			fmt.Println(141)
 			panic(err)
