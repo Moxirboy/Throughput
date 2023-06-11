@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	db "project/database"
+	db "project/db"
+	db2 "project/db"
 	"time"
 )
 
@@ -37,41 +38,41 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertClientQuery := "INSERT INTO client (name, created) VALUES (?, ?)"
-	_, err := db.DB.Query(insertClientQuery, details.Name, details.Date)
+	_, err := db2.DB.Query(insertClientQuery, details.Name, details.Date)
 	if err != nil {
 		panic(err)
 	}
 
 	insertProductQuery := "INSERT INTO goods (name, sort) VALUES (?, ?)"
-	_, err = db.DB.Query(insertProductQuery, product.Name, product.Sort)
+	_, err = db2.DB.Query(insertProductQuery, product.Name, product.Sort)
 	if err != nil {
 		panic(err)
 	}
 
-	clientID, err := getProductIDByName(db.DB, "client", details.Name)
+	clientID, err := db.GetProductIDByName(db2.DB, "client", details.Name)
 	if err != nil {
 		panic(err)
 	}
 
 	insertPurchaseQuery := "INSERT INTO purchase (name, client_id) VALUES (?, ?)"
-	_, err = db.DB.Query(insertPurchaseQuery, product.Name, clientID)
+	_, err = db2.DB.Query(insertPurchaseQuery, product.Name, clientID)
 	if err != nil {
 		panic(err)
 	}
 
 	// Retrieve the product and purchase IDs
-	productID, err := getProductIDByName(db.DB, "goods", product.Name)
+	productID, err := db.GetProductIDByName(db2.DB, "goods", product.Name)
 	if err != nil {
 		panic(err)
 	}
 
-	purchaseID, err := getProductIDByName(db.DB, "purchase", product.Name)
+	purchaseID, err := db.GetProductIDByName(db2.DB, "purchase", product.Name)
 	if err != nil {
 		panic(err)
 	}
 
 	insertPurchaseGoodsQuery := "INSERT INTO purchase_goods (goods_id, purchase_id, amount,cort_price) VALUES (?, ?, ?,?)"
-	_, err = db.DB.Query(insertPurchaseGoodsQuery, productID, purchaseID, purchase.Amount, purchaseGoods.CortPrice)
+	_, err = db2.DB.Query(insertPurchaseGoodsQuery, productID, purchaseID, purchase.Amount, purchaseGoods.CortPrice)
 	if err != nil {
 		panic(err)
 	}
@@ -90,9 +91,7 @@ func HandleRoot1(w http.ResponseWriter, r *http.Request) {
 	date := time.Now()
 	Requirement := db.Requirement{
 		Date: date,
-		Client: db.Client{
-			Name: r.FormValue("client"),
-		},
+		Name: r.FormValue("client"),
 	}
 	_ = Requirement
 	RequirementGoods := db.RequirementGoods{
@@ -103,7 +102,7 @@ func HandleRoot1(w http.ResponseWriter, r *http.Request) {
 	_ = RequirementGoods
 	var amountCheck string
 	var goodsId string
-	err := db.DB.QueryRow("select id from kirim.goods where name=?", RequirementGoods.Product).Scan(&goodsId)
+	err := db2.DB.QueryRow("select id from kirim.goods where name=?", RequirementGoods.Product).Scan(&goodsId)
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Println("Panic occurred:", err)
@@ -113,7 +112,7 @@ func HandleRoot1(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(113)
 		panic(err)
 	}
-	err = db.DB.QueryRow("select amount from purchase_goods where goods_id=?", goodsId).Scan(&amountCheck)
+	err = db2.DB.QueryRow("select amount from purchase_goods where goods_id=?", goodsId).Scan(&amountCheck)
 	if err != nil {
 		fmt.Println(118)
 		panic(err)
@@ -121,23 +120,23 @@ func HandleRoot1(w http.ResponseWriter, r *http.Request) {
 	if amountCheck >= RequirementGoods.Amount {
 		tmpl.Execute(w, struct{ success bool }{true})
 		var clientId string
-		err = db.DB.QueryRow("select id from client where name=?", Requirement.Name).Scan(&clientId)
+		err = db2.DB.QueryRow("select id from client where name=?", Requirement.Name).Scan(&clientId)
 		if err != nil {
 			fmt.Println(126)
 			panic(err)
 		}
-		_, err = db.DB.Query("insert into requirement (date,client_id) values(?,?)", Requirement.Date, clientId)
+		_, err = db2.DB.Query("insert into requirement (date,client_id) values(?,?)", Requirement.Date, clientId)
 		if err != nil {
 			fmt.Println(130)
 			panic(err)
 		}
 		var RequirementId string
-		err = db.DB.QueryRow("select id from requirement where client_id=?", clientId).Scan(&RequirementId)
+		err = db2.DB.QueryRow("select id from requirement where client_id=?", clientId).Scan(&RequirementId)
 		if err != nil {
 			fmt.Println(136)
 			panic(err)
 		}
-		_, err = db.DB.Query("insert into requirement_goods (requirement_id,goods_id,amount,cost_cell) values(?,?,?,?)", RequirementId, goodsId, RequirementGoods.Amount, RequirementGoods.CostCell)
+		_, err = db2.DB.Query("insert into requirement_goods (requirement_id,goods_id,amount,cost_cell) values(?,?,?,?)", RequirementId, goodsId, RequirementGoods.Amount, RequirementGoods.CostCell)
 		if err != nil {
 			fmt.Println(141)
 			panic(err)
