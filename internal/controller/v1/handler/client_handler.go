@@ -1,10 +1,8 @@
-package db
+package handler
 
-// Client represents a client entity
-type Client struct {
-	Name string
-	Date string
-}
+import (
+	_ "github.com/go-sql-driver/mysql"
+)
 
 func GetClientNames() []string {
 	rows, err := DB.Query("SELECT name FROM kirim.client;")
