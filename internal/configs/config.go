@@ -3,17 +3,15 @@ package configs
 import (
 	"database/sql"
 	"fmt"
-	"github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
-	"log"
 	"os"
 )
 
-func DB(cfg *mysql.Config) (*sql.DB, error) {
+func DB() (*sql.DB, error) {
 	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	//if err != nil {
+	//	log.Fatal("Error loading .env file")
+	//}
 	// Access the environment variables
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")

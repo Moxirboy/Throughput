@@ -1,8 +1,9 @@
-package repo
+package mysql
 
 import (
 	"database/sql"
 	"fmt"
+	config "project/internal/configs"
 )
 
 func GetProductIDByName(DB *sql.DB, table string, productName string) (int, error) {
@@ -16,6 +17,7 @@ func GetProductIDByName(DB *sql.DB, table string, productName string) (int, erro
 	return productID, nil
 }
 func GetProductNames() []string {
+	DB, err := config.DB()
 	rows, err := DB.Query("select name from kirim.purchase;")
 	if err != nil {
 		fmt.Println(64)
