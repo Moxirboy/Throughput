@@ -3,11 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
-	hand "project/internal/controller/v1/handler"
+	rout "project/internal/controller"
 )
 
 func main() {
-	http.HandleFunc("/kirim", hand.Incoming)
-	http.HandleFunc("/chiqim", hand.Outcoming)
+	rout.Router()
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

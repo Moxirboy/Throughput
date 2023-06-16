@@ -15,25 +15,7 @@ func Incoming(w http.ResponseWriter, r *http.Request) {
 	}
 
 	r.ParseForm()
-
-	product := db3.Goods{
-		Name: r.FormValue("name_of_purchase"),
-		Sort: r.FormValue("sort"),
-	}
-
-	details := db3.Client{
-		Name: r.FormValue("cname"),
-		Date: r.FormValue("date"),
-	}
-
-	purchase := db3.Purchase{
-		Name:   r.FormValue("name_of_purchase"),
-		Amount: r.FormValue("amount"),
-	}
-	purchaseGoods := db3.PurchaseGoods{
-		CortPrice: r.FormValue("cost"),
-	}
-
+	FormValues(r)
 	insertClientQuery := "INSERT INTO client (name, created) VALUES (?, ?)"
 	_, err := db3.DB.Query(insertClientQuery, details.Name, details.Date)
 	if err != nil {

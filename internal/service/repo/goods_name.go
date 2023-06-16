@@ -1,8 +1,6 @@
-package db
+package repo
 
 import "fmt"
-
-// Goods represents a goods entity
 
 func GetGoodsNames() []string {
 	rows, err := DB.Query("select name from kirim.goods;")
@@ -20,9 +18,6 @@ func GetGoodsNames() []string {
 			fmt.Println(70)
 			panic(err)
 		}
-		//if err := rows.Scan(&name); err != nil {
-		//	GoodsNames = append(GoodsNames, name)
-		//}
 	}
 	if err := rows.Err(); err != nil {
 		return nil
