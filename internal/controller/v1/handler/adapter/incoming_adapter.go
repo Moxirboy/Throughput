@@ -2,17 +2,23 @@ package adapter
 
 import (
 	"net/http"
+	config "project/internal/configs"
 )
 import form "project/internal/controller/v1/dto"
 
+var (
+	db, _ = config.DB()
+)
 var Product form.Goods
 var DetailsClient form.Client
 var Purchase form.Purchase
 var PurchaseGoods form.PurchaseGoods
 
 func FormValues(r *http.Request) {
-
-	r.ParseForm()
+	err := r.ParseForm()
+	if err != nil {
+		panic(err)
+	}
 	Product = form.Goods{
 		Name: r.FormValue("name_of_purchase"),
 		Sort: r.FormValue("sort"),
@@ -31,5 +37,4 @@ func FormValues(r *http.Request) {
 	PurchaseGoods = form.PurchaseGoods{
 		CortPrice: r.FormValue("cost"),
 	}
-
 }

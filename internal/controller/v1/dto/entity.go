@@ -1,4 +1,4 @@
-package handler
+package dto
 
 import "time"
 
@@ -21,12 +21,11 @@ type PurchaseGoods struct {
 	CortPrice string
 }
 type Requirement struct {
-	Date   time.Time
-	Client Client
-	Name   any
+	NameClient string
+	Date       time.Time
 }
 type RequirementGoods struct {
-	Product  string
+	GoodName string
 	Amount   string
 	CostCell string
 }

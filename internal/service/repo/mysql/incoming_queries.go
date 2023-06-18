@@ -7,12 +7,12 @@ import (
 )
 
 var (
-	DB, _ = configs.DB()
+	Db, _ = configs.DB()
 )
 
 func GetGoodsNames() []string {
 
-	rows, err := DB.Query("select name from kirim.goods;")
+	rows, err := Db.Query("select name from kirim.goods;")
 	if err != nil {
 		fmt.Println(64)
 		panic(err)
@@ -35,11 +35,7 @@ func GetGoodsNames() []string {
 }
 
 func InsertClientQuery() {
-	insertClientQuery := "INSERT INTO client (name, created) VALUES (?, ?)"
-	fmt.Println(adapter.DetailsClient.Name, adapter.DetailsClient.Date)
-	var name string = adapter.DetailsClient.Name
-	var date string = adapter.DetailsClient.Date
-	query, err := DB.Query(insertClientQuery, name, date)
+	query, err := Db.Query("INSERT INTO client (name, created) VALUES (?, ?)", adapter.DetailsClient.Name, adapter.DetailsClient.Date)
 	defer query.Close()
 	if err != nil {
 		fmt.Println("InsertClientQuery")
@@ -48,14 +44,14 @@ func InsertClientQuery() {
 }
 func InsertProductQuery() {
 	insertProductQuery := "INSERT INTO goods (name, sort) VALUES (?, ?)"
-	_, err := DB.Query(insertProductQuery, adapter.Product.Name, adapter.Product.Sort)
+	_, err := Db.Query(insertProductQuery, adapter.Product.Name, adapter.Product.Sort)
 	if err != nil {
 		fmt.Println("InsertProductQuery")
 		panic(err)
 	}
 }
 func InsertPurchaseQuery() {
-	clientID, err := GetProductIDByName(DB, "client", adapter.DetailsClient.Name)
+	clientID, err := GetProductIDByName(Db, "client", adapter.DetailsClient.Name)
 	if err != nil {
 		fmt.Println("clientId   InsertPurchaseQuery")
 		panic(err)
@@ -63,27 +59,27 @@ func InsertPurchaseQuery() {
 	}
 
 	insertPurchaseQuery := "INSERT INTO purchase (name, client_id) VALUES (?, ?)"
-	_, err = DB.Query(insertPurchaseQuery, adapter.Product.Name, clientID)
+	_, err = Db.Query(insertPurchaseQuery, adapter.Product.Name, clientID)
 	if err != nil {
 		fmt.Println("from query   InsertPurchaseQuery")
 		panic(err)
 	}
 }
 func InsertPurchaseGoodsQuery() {
-	productID, err := GetProductIDByName(DB, "goods", adapter.Product.Name)
+	productID, err := GetProductIDByName(Db, "goods", adapter.Product.Name)
 	if err != nil {
 		fmt.Println("productID   InsertPurchaseGoodsQuery")
 		panic(err)
 	}
 
-	purchaseID, err := GetProductIDByName(DB, "purchase", adapter.Product.Name)
+	purchaseID, err := GetProductIDByName(Db, "purchase", adapter.Product.Name)
 	if err != nil {
 		fmt.Println("purchaseID   InsertPurchaseGoodsQuery")
 		panic(err)
 	}
 
 	insertPurchaseGoodsQuery := "INSERT INTO purchase_goods (goods_id, purchase_id, amount,cort_price) VALUES (?, ?, ?,?)"
-	_, err = DB.Query(insertPurchaseGoodsQuery, productID, purchaseID, adapter.Purchase.Amount, adapter.PurchaseGoods.CortPrice)
+	_, err = Db.Query(insertPurchaseGoodsQuery, productID, purchaseID, adapter.Purchase.Amount, adapter.PurchaseGoods.CortPrice)
 	if err != nil {
 		fmt.Println("from query   InsertPurchaseGoodsQuery")
 		panic(err)

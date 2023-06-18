@@ -4,23 +4,21 @@ import (
 	"net/http"
 	"time"
 )
-import form "project/internal/controller/v1/dto"
+import "project/internal/controller/v1/dto"
 
-var Requirement form.Requirement
-var RequirementGoods form.RequirementGoods
+var Requirements dto.Requirement
+var RequirementGood dto.RequirementGoods
 
 func FormValue(r *http.Request) {
 	date := time.Now()
-	Requirement := form.Requirement{
-		Date: date,
-		Name: r.FormValue("client"),
+	Requirements = dto.Requirement{
+		NameClient: r.FormValue("clients"),
+		Date:       date,
 	}
-	_ = Requirement
-
-	RequirementGoods := form.RequirementGoods{
-		Product:  r.FormValue("goods"),
+	RequirementGood = dto.RequirementGoods{
+		GoodName: r.FormValue("goods"),
 		Amount:   r.FormValue("amount"),
 		CostCell: r.FormValue("cost"),
 	}
-	_ = RequirementGoods
+
 }

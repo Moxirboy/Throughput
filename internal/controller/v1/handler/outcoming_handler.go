@@ -4,66 +4,39 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"project/internal/configs"
 	"project/internal/controller/v1/handler/adapter"
+	"project/internal/service/repo/mysql"
 	"project/templates"
 )
 
-var (
-	DB, _ = configs.DB()
-)
+var err error
 
 func Outcoming(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("Panic occurred:", err)
+		}
+	}()
 	tmpl := template.Must(template.ParseFiles("C:/Users/User/Documents/GitHub/project/templates/coming.html"))
-	DropdownHTMLClient := templates.GenerateDropdownHTMLProduct()
+	DropdownHTMLClient := templates.GenerateDropdownHTMLClient()
 	DropdownHTMLGoods := templates.GenerateDropdownHTMLGoods()
 	tmpl.Execute(w, map[string]interface{}{
 		"DropdownHTMLClient": template.HTML(DropdownHTMLClient),
 		"DropdownHTMLGoods":  template.HTML(DropdownHTMLGoods),
 	})
 	r.ParseForm()
-	var amountCheck string
-	var goodsId string
-	err := DB.QueryRow("select id from kirim.goods where name=?", adapter.RequirementGoods.Product).Scan(&goodsId)
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println("Panic occurred:", err)
-		}
-	}()
-	if err != nil {
-
-		panic(err)
-	}
-	err = DB.QueryRow("select amount from purchase_goods where goods_id=?", goodsId).Scan(&amountCheck)
-	if err != nil {
-
-		panic(err)
-	}
-	if amountCheck >= adapter.RequirementGoods.Amount {
-		tmpl.Execute(w, struct{ success bool }{true})
-		var clientId string
-		err = DB.QueryRow("select id from client where name=?", adapter.Requirement.Name).Scan(&clientId)
-		if err != nil {
-
-			panic(err)
-		}
-		_, err = DB.Query("insert into requirement (date,client_id) values(?,?)", adapter.Requirement.Date, clientId)
-		if err != nil {
-
-			panic(err)
-		}
-		var RequirementId string
-		err = DB.QueryRow("select id from requirement where client_id=?", clientId).Scan(&RequirementId)
-		if err != nil {
-			panic(err)
-		}
-		_, err = DB.Query("insert into requirement_goods (requirement_id,goods_id,amount,cost_cell) values(?,?,?,?)", "RequirementId, goodsId, RequirementGoods.Amount, RequirementGoods.CostCell")
-		if err != nil {
-
-			panic(err)
-		}
+	adapter.FormValue(r)
+	if mysql.AmountCheck() >= adapter.RequirementGood.Amount {
+		mysql.InserterRequirementGoods()
 		tmpl.Execute(w, struct{ success bool }{true})
 	} else {
+		response := "not enough amount!"
+		_, err := w.Write([]byte(response))
+		if err != nil {
+			// Handle the error if writing the response fails
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		tmpl.Execute(w, struct{ success bool }{false})
 	}
 }

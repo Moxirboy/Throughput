@@ -6,22 +6,24 @@ import (
 	"github.com/joho/godotenv"
 	"os"
 )
+import _ "github.com/go-sql-driver/mysql"
 
 func DB() (*sql.DB, error) {
-	err := godotenv.Load()
-	//if err != nil {
-	//	log.Fatal("Error loading .env file")
-	//}
+	err := godotenv.Load("C:/Users/User/Documents/GitHub/project/.env")
+	if err != nil {
+		panic("Error loading .env file")
+	}
 	// Access the environment variables
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
-	mysqlString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s", dbHost, dbPort, dbUser, dbPassword, dbName)
+	mysqlString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
 	instance, err := sql.Open("mysql", mysqlString)
 	if err != nil {
-		return nil, err
+		fmt.Println("dfgh")
+		panic(err)
 	}
 	return instance, nil
 }

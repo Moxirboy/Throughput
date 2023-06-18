@@ -3,14 +3,19 @@ package handler
 import (
 	"html/template"
 	"net/http"
+	config "project/internal/configs"
 	"project/internal/controller/v1/handler/adapter"
-	repo "project/internal/service/repo/mysql"
+	"project/internal/service/repo/mysql"
+)
+
+var (
+	Db, _ = config.DB()
 )
 
 func Incoming(w http.ResponseWriter, r *http.Request) {
 	//defer func() {
-	//	if r := recover(); r != nil {
-	//		fmt.Println("Recovered from panic:", r)
+	//	if err := recover(); r != nil {
+	//		fmt.Println("Recovered from panic:", err)
 	//		// Perform any necessary cleanup or logging here
 	//	}
 	//}()
@@ -20,10 +25,10 @@ func Incoming(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	adapter.FormValues(r)
-	repo.InsertClientQuery()
-	repo.InsertProductQuery()
-	repo.InsertPurchaseQuery()
-	repo.InsertPurchaseGoodsQuery()
+	mysql.InsertClientQuery()
+	mysql.InsertProductQuery()
+	mysql.InsertPurchaseQuery()
+	mysql.InsertPurchaseGoodsQuery()
 
 	tmpl.Execute(w, struct{ Success bool }{true})
 }
