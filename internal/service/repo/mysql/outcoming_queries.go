@@ -3,14 +3,10 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
-	"project/internal/configs"
 	"project/internal/controller/v1/handler/adapter"
 )
 
 var err error
-var (
-	DB, _ = configs.DB()
-)
 
 func GetProductIDByName(DB *sql.DB, table string, productName string) (int, error) {
 	var productID int
@@ -19,16 +15,20 @@ func GetProductIDByName(DB *sql.DB, table string, productName string) (int, erro
 	if err != nil {
 		return 0, err
 	}
-
 	return productID, nil
 }
-func GetClientNames() []string {
+func GetClientNames(DB *sql.DB) []string {
 	rows, err := DB.Query("select name from kirim.client;")
 	if err != nil {
 		fmt.Println(64)
 		panic(err)
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+
+		}
+	}(rows)
 	var ClientNames []string
 	for rows.Next() {
 		var name string
@@ -44,41 +44,73 @@ func GetClientNames() []string {
 	}
 	return ClientNames
 }
-func GoodsId() string {
+func GoodsId(DB *sql.DB) string {
 	var goodsId string
-	err = DB.QueryRow("select id from kirim.goods where name=?", adapter.RequirementGood.GoodName).Scan(&goodsId)
+	err = DB.QueryRow("select id from kirim.goods where name=?", adapter.RequirementGoods.GoodName).Scan(&goodsId)
+
 	if err != nil {
-		panic(err)
+		if err == sql.ErrNoRows {
+			fmt.Println("No rows found.")
+		} else {
+			fmt.Println("Error occurred:", err)
+		}
+	} else {
+		// Process the retrieved goodsId
+		fmt.Println("Goods ID:", goodsId)
 	}
 	return goodsId
 }
-func AmountCheck() (amountCheck string) {
-	err = DB.QueryRow("select amount from purchase_goods where goods_id=?", GoodsId()).Scan(&amountCheck)
+func AmountCheck(DB *sql.DB) (amountCheck string) {
+	err = DB.QueryRow("select amount from purchase_goods where goods_id=?", GoodsId(DB)).Scan(&amountCheck)
+
 	if err != nil {
-		panic(err)
+		if err == sql.ErrNoRows {
+			fmt.Println("No rows found.")
+		} else {
+			fmt.Println("Error occurred:", err)
+		}
+	} else {
+		// Process the retrieved goodsId
+		fmt.Println("amountCheck:", amountCheck)
 	}
 	return amountCheck
 }
-func InserterRequirementGoods() {
+func (r *RequirementImpl) InserterRequirementGoods(DB *sql.DB) error {
 	var clientId string
-	err = DB.QueryRow("select id from client where name=?", adapter.Requirements.NameClient).Scan(&clientId)
-	if err != nil {
+	err := DB.QueryRow("select id from client where name=?", r.Requirement.NameClient).Scan(&clientId)
 
-		panic(err)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("No rows found.")
+		} else {
+			fmt.Println("Error occurred:", err)
+		}
+	} else {
+		// Process the retrieved goodsId
+		fmt.Println("client ID:", clientId)
 	}
-	_, err = DB.Query("insert into requirement (date,client_id) values(?,?)", adapter.Requirements.Date, clientId)
+	_, err = DB.Query("insert into requirement (date,client_id) values(?,?)", r.Requirement.Date, clientId)
 	if err != nil {
 
-		panic(err)
+		return err
 	}
 	var RequirementId string
 	err = DB.QueryRow("select id from requirement where client_id=?", clientId).Scan(&RequirementId)
+
 	if err != nil {
-		panic(err)
+		if err == sql.ErrNoRows {
+			fmt.Println("No rows found.")
+		} else {
+			fmt.Println("Error occurred:", err)
+		}
+	} else {
+		// Process the retrieved goodsId
+		fmt.Println("Requirement ID:", RequirementId)
 	}
-	_, err = DB.Query("insert into requirement_goods (requirement_id,goods_id,amount,cost_cell) values(?,?,?,?)", RequirementId, GoodsId(), adapter.RequirementGood.Amount, adapter.RequirementGood.CostCell)
+	_, err = DB.Query("insert into requirement_goods (requirement_id,goods_id,amount,cost_cell) values(?,?,?,?)", RequirementId, GoodsId(DB), r.RequirementGood.Amount, r.RequirementGood.CostCell)
 	if err != nil {
 
-		panic(err)
+		return err
 	}
+	return nil
 }

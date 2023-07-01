@@ -2,15 +2,11 @@ package adapter
 
 import (
 	"net/http"
-	config "project/internal/configs"
 )
 import form "project/internal/controller/v1/dto"
 
-var (
-	db, _ = config.DB()
-)
 var Product form.Goods
-var DetailsClient form.Client
+var Client form.Client
 var Purchase form.Purchase
 var PurchaseGoods form.PurchaseGoods
 
@@ -24,17 +20,18 @@ func FormValues(r *http.Request) {
 		Sort: r.FormValue("sort"),
 	}
 
-	DetailsClient = form.Client{
+	Client = form.Client{
 		Name: r.FormValue("cname"),
 		Date: r.FormValue("date"),
 	}
 
 	Purchase = form.Purchase{
 		Name:   r.FormValue("name_of_purchase"),
-		Amount: r.FormValue("amount"),
+		Amount: r.FormValue("amoun"),
 	}
 	_ = Purchase
 	PurchaseGoods = form.PurchaseGoods{
 		CortPrice: r.FormValue("cost"),
 	}
+
 }

@@ -1,2 +1,2 @@
-.env
+cmd/app/app.env
 .idea/

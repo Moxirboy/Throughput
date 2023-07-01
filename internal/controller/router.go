@@ -7,5 +7,5 @@ import (
 
 func Router() {
 	http.HandleFunc("/kirim", hand.Incoming)
-	http.HandleFunc("/chiqim", hand.Outcoming)
+	http.HandleFunc("/chiqim", hand.Outcome)
 }

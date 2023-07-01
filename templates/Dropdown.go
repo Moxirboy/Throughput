@@ -1,11 +1,13 @@
 package templates
 
 import (
+	"project/internal/conn"
 	"project/internal/service/repo/mysql"
 )
 
 func GenerateDropdownHTMLGoods() string {
-	GoodsNames := mysql.GetGoodsNames()
+
+	GoodsNames := mysql.GetGoodsNames(conn.DB)
 	dropdownHTML := "<select name='goods'>"
 	for _, name := range GoodsNames {
 		dropdownHTML += "<option value='" + name + "'>" + name + "</option>"
@@ -15,7 +17,7 @@ func GenerateDropdownHTMLGoods() string {
 	return dropdownHTML
 }
 func GenerateDropdownHTMLClient() string {
-	ProductsNames := mysql.GetClientNames()
+	ProductsNames := mysql.GetClientNames(conn.DB)
 	dropdownHTML := "<select name='clients'>"
 	for _, name := range ProductsNames {
 		dropdownHTML += "<option value='" + name + "'>" + name + "</option>"

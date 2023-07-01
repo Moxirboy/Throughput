@@ -1,18 +1,13 @@
 package mysql
 
 import (
+	"database/sql"
 	"fmt"
-	"project/internal/configs"
-	"project/internal/controller/v1/handler/adapter"
 )
 
-var (
-	Db, _ = configs.DB()
-)
+func GetGoodsNames(DB *sql.DB) []string {
 
-func GetGoodsNames() []string {
-
-	rows, err := Db.Query("select name from kirim.goods;")
+	rows, err := DB.Query("select name from kirim.goods;")
 	if err != nil {
 		fmt.Println(64)
 		panic(err)
@@ -34,54 +29,56 @@ func GetGoodsNames() []string {
 	return GoodsNames
 }
 
-func InsertClientQuery() {
-	query, err := Db.Query("INSERT INTO client (name, created) VALUES (?, ?)", adapter.DetailsClient.Name, adapter.DetailsClient.Date)
-	defer query.Close()
+func (cq *ClientQueryImpl) InsertClientQuery(db *sql.DB) error {
+	insertClientQuery := "INSERT INTO kirim.client (name) VALUES (?)"
+	_, err := db.Exec(insertClientQuery, cq.DetailsClient.Name)
 	if err != nil {
-		fmt.Println("InsertClientQuery")
-		panic(err)
+		return err
 	}
+	return nil
 }
-func InsertProductQuery() {
-	insertProductQuery := "INSERT INTO goods (name, sort) VALUES (?, ?)"
-	_, err := Db.Query(insertProductQuery, adapter.Product.Name, adapter.Product.Sort)
+
+func (pq *ProductQueryImpl) InsertProductQuery(db *sql.DB) error {
+	insertProductQuery := "INSERT INTO kirim.goods (name, sort) VALUES (?, ?)"
+	_, err := db.Exec(insertProductQuery, pq.Product.Name, pq.Product.Sort)
 	if err != nil {
-		fmt.Println("InsertProductQuery")
-		panic(err)
+		return err
 	}
+	return nil
 }
-func InsertPurchaseQuery() {
-	clientID, err := GetProductIDByName(Db, "client", adapter.DetailsClient.Name)
-	if err != nil {
-		fmt.Println("clientId   InsertPurchaseQuery")
-		panic(err)
 
+func (pq *PurchaseQueryImpl) InsertPurchaseQuery(db *sql.DB) error {
+	clientID, err := GetProductIDByName(db, "client", pq.DetailsClient.Name)
+	if err != nil {
+		return err
 	}
 
-	insertPurchaseQuery := "INSERT INTO purchase (name, client_id) VALUES (?, ?)"
-	_, err = Db.Query(insertPurchaseQuery, adapter.Product.Name, clientID)
+	insertPurchaseQuery := "INSERT INTO kirim.purchase (name, client_id) VALUES (?, ?)"
+	_, err = db.Exec(insertPurchaseQuery, pq.Product.Name, clientID)
 	if err != nil {
-		fmt.Println("from query   InsertPurchaseQuery")
-		panic(err)
+		return err
 	}
+	return nil
 }
-func InsertPurchaseGoodsQuery() {
-	productID, err := GetProductIDByName(Db, "goods", adapter.Product.Name)
+
+func (pgq *PurchaseGoodsQueryImpl) InsertPurchaseGoodsQuery(db *sql.DB) error {
+	productID, err := GetProductIDByName(db, "goods", pgq.Product.Name)
 	if err != nil {
-		fmt.Println("productID   InsertPurchaseGoodsQuery")
 		panic(err)
+		return err
 	}
 
-	purchaseID, err := GetProductIDByName(Db, "purchase", adapter.Product.Name)
+	purchaseID, err := GetProductIDByName(db, "purchase", pgq.Product.Name)
 	if err != nil {
-		fmt.Println("purchaseID   InsertPurchaseGoodsQuery")
 		panic(err)
+		return err
 	}
 
-	insertPurchaseGoodsQuery := "INSERT INTO purchase_goods (goods_id, purchase_id, amount,cort_price) VALUES (?, ?, ?,?)"
-	_, err = Db.Query(insertPurchaseGoodsQuery, productID, purchaseID, adapter.Purchase.Amount, adapter.PurchaseGoods.CortPrice)
+	insertPurchaseGoodsQuery := "INSERT INTO kirim.purchase_goods (goods_id, purchase_id, amount, cort_price) VALUES (?, ?, ?, ?)"
+	_, err = db.Query(insertPurchaseGoodsQuery, productID, purchaseID, pgq.Purchase.Amount, pgq.PurchaseGoods.CortPrice)
 	if err != nil {
-		fmt.Println("from query   InsertPurchaseGoodsQuery")
-		panic(err)
+		fmt.Println(80, "     ", err)
+		return err
 	}
+	return nil
 }
