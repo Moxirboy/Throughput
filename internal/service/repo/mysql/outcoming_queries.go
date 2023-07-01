@@ -109,7 +109,8 @@ func (r *RequirementImpl) InserterRequirementGoods(DB *sql.DB) error {
 	}
 	_, err = DB.Query("insert into requirement_goods (requirement_id,goods_id,amount,cost_cell) values(?,?,?,?)", RequirementId, GoodsId(DB), r.RequirementGood.Amount, r.RequirementGood.CostCell)
 	if err != nil {
-
+		print("hello")
+		print('helloo2')
 		return err
 	}
 	return nil
