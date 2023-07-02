@@ -3,18 +3,22 @@ package configs
 import (
 	"database/sql"
 	"fmt"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/spf13/viper"
 	"log"
 )
+
 import _ "github.com/go-sql-driver/mysql"
 
 type Config struct {
-	DbHost     string `mapstructure:"DB_HOST"`
-	DbPort     string `mapstructure:"DB_PORT"`
-	DbUser     string `mapstructure:"DB_USER"`
-	DbPassword string `mapstructure:"DB_PASSWORD"`
-	DbName     string `mapstructure:"DB_NAME"`
+	DbHost        string `mapstructure:"DB_HOST"`
+	DbPort        string `mapstructure:"DB_PORT"`
+	Migration_Url string `mapstructure:"MIGRATION_URL"`
+	DbUser        string `mapstructure:"DB_USER"`
+	DbPassword    string `mapstructure:"DB_PASSWORD"`
+	DbName        string `mapstructure:"DB_NAME"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
@@ -37,7 +41,16 @@ func LoadConfig(path string) (config Config, err error) {
 	fmt.Printf("Loaded config: %+v\n", config)
 	return
 }
-
+func runDBmigration(migrationUrl string, db string) {
+	migration, err := migrate.New(migrationUrl, db)
+	if err != nil {
+		log.Fatal("failed to migrate db")
+	}
+	if err = migration.Up(); err != nil && migrate.ErrNoChange != nil {
+		log.Fatal("failed to migrate db")
+	}
+	log.Println("successfully migrated db")
+}
 func DB() (*sql.DB, error) {
 	config, err := LoadConfig(".")
 	if err != nil {
@@ -51,5 +64,6 @@ func DB() (*sql.DB, error) {
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}
+	runDBmigration(config.Migration_Url, config.DbPort)
 	return conn, nil
 }
