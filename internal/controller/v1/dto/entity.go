@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -31,33 +30,4 @@ type Purchase struct {
 
 type PurchaseGoods struct {
 	CortPrice any
-}
-
-type IAdapter struct {
-	Product       Goods
-	Client        Client
-	Purchase      Purchase
-	PurchaseGoods PurchaseGoods
-}
-type RAdapter struct {
-	Requirements     Requirements
-	RequirementGoods RequirementGoods
-}
-type RequirementUsecase interface {
-	InserterRequirementGoods(DB *sql.DB) error
-}
-type ClientQuery interface {
-	InsertClientQuery(db *sql.DB) error
-}
-
-type ProductQuery interface {
-	InsertProductQuery(db *sql.DB) error
-}
-
-type PurchaseQuery interface {
-	InsertPurchaseQuery(db *sql.DB) error
-}
-
-type PurchaseGoodsQuery interface {
-	InsertPurchaseGoodsQuery(db *sql.DB) error
 }

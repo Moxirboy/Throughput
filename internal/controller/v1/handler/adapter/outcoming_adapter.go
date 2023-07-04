@@ -9,7 +9,7 @@ import "project/internal/controller/v1/dto"
 
 var Requirements dto.Requirements
 var RequirementGoods dto.RequirementGoods
-var RAdapter dto.RAdapter
+
 var Submit string
 var Date = time.Now()
 
@@ -28,10 +28,7 @@ func FormValue(r *http.Request) {
 		Amount:   r.FormValue("amount"),
 		CostCell: r.FormValue("costCell"),
 	}
-	RAdapter = dto.RAdapter{
-		Requirements:     Requirements,
-		RequirementGoods: RequirementGoods,
-	}
+
 	Submit = r.FormValue("submit")
 	if Submit != "" {
 		fmt.Println(RequirementGoods, "\n", Requirements)
