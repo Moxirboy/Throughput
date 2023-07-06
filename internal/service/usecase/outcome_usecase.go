@@ -42,7 +42,10 @@ func OutCome(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 
 		adapter.FormValue(r)
-		RequirementQuery := &mysql.RequirementImpl{
+		ProductQueryImpl := &mysql.ProductQueryImpl{
+			ProductName: adapter.RequirementGoods,
+		}
+		RequirementQuery := &RequirementImpl{
 			Requirement:     adapter.Requirements,
 			RequirementGood: adapter.RequirementGoods,
 		}
@@ -53,7 +56,7 @@ func OutCome(w http.ResponseWriter, r *http.Request) {
 		}()
 		if adapter.FormValidate(adapter.RequirementGoods, adapter.Requirements) {
 			fmt.Println("validating")
-			if mysql.AmountCheck(conn.Db) >= RequirementQuery.RequirementGood.Amount {
+			if ProductQueryImpl.GetAmount(conn.Db) >= RequirementQuery.RequirementGood.Amount {
 				err := RequirementQuery.InserterRequirementGoods(conn.Db)
 				if err != nil {
 					fmt.Println("Error inserting client:", err)

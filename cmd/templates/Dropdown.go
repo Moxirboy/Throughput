@@ -7,7 +7,7 @@ import (
 
 func GenerateDropdownHTMLGoods() string {
 
-	GoodsNames := mysql.GetGoodsNames(conn.Db)
+	GoodsNames := mysql.GetName(conn.Db)
 	dropdownHTML := "<select name='goods'>"
 	for _, name := range GoodsNames {
 		dropdownHTML += "<option value='" + name + "'>" + name + "</option>"

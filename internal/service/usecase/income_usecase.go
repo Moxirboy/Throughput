@@ -37,13 +37,13 @@ func Income(w http.ResponseWriter, r *http.Request) {
 			Product: adapter.Product,
 		}
 
-		purchaseQuery := &mysql.PurchaseQueryImpl{
+		purchaseQuery := &PurchaseQueryImpl{
 			Product:       adapter.Product,
 			DetailsClient: adapter.Client,
 			Purchase:      adapter.Purchase,
 		}
 
-		purchaseGoodsQuery := &mysql.PurchaseGoodsQueryImpl{
+		purchaseGoodsQuery := &PurchaseGoodsQueryImpl{
 			Product:       adapter.Product,
 			Purchase:      adapter.Purchase,
 			PurchaseGoods: adapter.PurchaseGoods,
