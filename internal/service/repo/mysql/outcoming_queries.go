@@ -3,7 +3,6 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
-	_ "project/internal/service/usecase"
 )
 
 var err error
